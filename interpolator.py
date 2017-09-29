@@ -29,7 +29,7 @@ def fmt_func(s):
     prefix = re.match(r'.+=\s*', s)
     if prefix:
         s = s.replace(prefix.group(), '')
-    match = re.match(r'^\s*[\w_][\w\d_.]*\s*(?=\()', s)
+    match = re.match(r'^\s*[\w_]([\w\d_.]?[\w\d_])*\s*(?=\()', s)
     if match:
         return match.group()
     else:
@@ -37,83 +37,21 @@ def fmt_func(s):
 
 
 def pretty(s, initial_big=False):
-    l = s.split('_')
-    p = ''
+    if len(s) == 0:
+        return ""
+    fmtd = ''.join([x for x in s.title().split('_')])
     if initial_big:
-        for x in l:
-            p += x.capitalize()
+        return fmtd
     else:
-        for i in range(len(l)):
-            if i == 0:
-                p += l[i].lower()
-            else:
-                p += l[i].capitalize()
-    return p
-
-
-def scratch():
-    methods = ['insulin', 'age_band', 'duration', 'hba1c', 'blood_pressure', 'cholesterol', 'micro_albuminuria',
-               'frank_proteinuria', 'neuropathy', 'alcohol', 'smoking']
-    fmt = ''
-    for m in methods:
-        fmt += f"""{pretty(m)} = mapper.map{pretty(m, True)}();\n"""
-    print(fmt)
-
-
-def scratch2():
-    vals = ['insulin', 'age_band', 'duration', 'hba1c', 'blood_pressure', 'cholesterol', 'micro_albuminuria',
-            'frank_proteinuria', 'neuropathy', 'alcohol', 'smoking']
-    for s in vals:
-        fmt = pretty(s)
-        print(f'System.out.println("{fmt} = "+{fmt});')
-
-
-def query_scratcher1():
-    vals = ['insulin', 'age_band', 'duration', 'hba1c', 'blood_pressure', 'cholesterol', 'micro_albuminuria',
-            'frank_proteinuria', 'neuropathy', 'alcohol', 'smoking']
-    for s in vals:
-        print(f""""AND {s}_ = ? " +""")
-
-
-def query_scratcher2():
-    vals = ['insulin', 'age_band', 'duration', 'hba1c', 'blood_pressure', 'cholesterol', 'micro_albuminuria',
-            'frank_proteinuria', 'neuropathy', 'alcohol', 'smoking']
-    i = 3
-    for s in vals:
-        print(f"""ps.setString({i}, {pretty(s)});""")
-        i += 1
-
-
-def dbg_vars():
-    args = '''
-    '''
-    lines_in = [s for s in [s1.strip() for s1 in args.split('\n') if s1 is not None] if len(s) > 0]
-    lines_out = []
-    for line in lines_in:
-
-        fmt = cat_args(find_args(line))
-        func = fmt_func(line)
-        if len(func) > 0:
-            match_pf = re.match(r'^[\w_][\w_\d]*(?=\s*=\s*)', line)
-            acceptor = ''
-            lacc = ''
-            racc = ''
-
-            if match_pf:
-                s = match_pf.group()
-                acceptor += f'+" = "+{s}'
-                lacc = f'{acceptor} = '
-                racc = f'+{acceptor}'
-
-            lines_out.append(f'System.out.println("[DEBUG] {lacc}{func}({fmt})"{racc});')
-        elif len(fmt) > 0:
-            lines_out.append(f'System.out.println("[DEBUG] {fmt}");')
-    return lines_out
+        if len(fmtd) == 1:
+            return fmtd.lower()
+        else:
+            return fmtd[0].lower() + fmtd[1:]
 
 
 def fmt_acceptor(assignee):
     lacc = f'{assignee} = '
-    racc = f'+" => "+{assignee}'
+    racc = f' => "+{assignee}'
     return lacc, racc
 
 
@@ -133,7 +71,10 @@ def dbg_line(line):
     func = fmt_func(expr)
 
     fmt = cat_args(find_args(line))
-    return f'System.out.println("[DEBUG] {acceptors[0]}{func}({fmt})"{acceptors[1]});'
+    if len(func) > 0:
+        return f'System.out.println("[DEBUG] {acceptors[0]}{func}({fmt}){acceptors[1]});'
+    elif len(fmt) > 0:
+        return f'System.out.println("[DEBUG] {acceptors[0]}{fmt}{acceptors[1]});'
 
 
 def rem_comments(code):
@@ -154,7 +95,8 @@ def sys_out(lines):
 
 def main():
     sys_out('''
-int x = Integer.parseInt("12");
+String s = "12"
+int x = Integer.parseInt(s);
 ''')
 
 
