@@ -91,8 +91,13 @@ def sys_out(lines):
 
 def main():
     sys_out('''
-String s = "12"
-int x = Integer.parseInt(s);
+BigDecimal minPremium = product.getMinPremium()
+maxCover=product.getMaxCover()
+baseMargin=product.getBaseMargin()
+loadMargin=product.getLoadMargin(),
+minGap=product.getMinGap()
+maxGap=product.getMaxGap()
+policyFee=product.getPolicyFee();
 ''')
 
 
