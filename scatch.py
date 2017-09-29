@@ -1,4 +1,4 @@
-from interpolator import pretty
+from jformat import pretty
 
 
 def scratch():

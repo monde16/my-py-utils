@@ -1,5 +1,4 @@
 
-
 def sort_strings(s, delim):
     return sorted(s.split(delim))
 
@@ -26,6 +25,7 @@ coverAmount: BigDecimal
 accept: String
 comment: String'''
     [print(x) for x in sort_strings(s, '\n')]
+
 
 if __name__ == '__main__':
     main()

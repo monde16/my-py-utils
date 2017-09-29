@@ -1,10 +1,6 @@
 import re
 
 
-# System.out.println();
-# System.out.println("[DEBUG] ");
-
-
 def find_args(line):
     return re.findall(r'(?<=[(,\s])([\w_][\w_.\d]*|[\w_][\w_.\d]*\(\))(?=[,)])', line)
 
