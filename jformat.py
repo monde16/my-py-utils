@@ -67,10 +67,12 @@ def dbg_line(line):
     func = fmt_func(expr)
 
     fmt = cat_args(find_args(line))
+    # method = 'log.info'
+    method = 'System.out.println'
     if len(func) > 0:
-        return f'System.out.println("[DEBUG] {acceptors[0]}{func}({fmt}){acceptors[1]});'
+        return f'{method}("[DEBUG] {acceptors[0]}{func}({fmt}){acceptors[1]});'
     elif len(fmt) > 0:
-        return f'System.out.println("[DEBUG] {acceptors[0]}{fmt}{acceptors[1]});'
+        return f'{method}("[DEBUG] {acceptors[0]}{fmt}{acceptors[1]});'
 
 
 def rem_comments(code):
@@ -91,13 +93,6 @@ def sys_out(lines):
 
 def main():
     sys_out('''
-BigDecimal minPremium = product.getMinPremium()
-maxCover=product.getMaxCover()
-baseMargin=product.getBaseMargin()
-loadMargin=product.getLoadMargin(),
-minGap=product.getMinGap()
-maxGap=product.getMaxGap()
-policyFee=product.getPolicyFee();
 ''')
 
 

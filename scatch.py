@@ -34,9 +34,20 @@ def query_scratcher2():
         i += 1
 
 
+def scratch3():
+    map = {
+    }
+    for k, v in map.items():
+        if isinstance(v, str):
+            print(f'Pair("{k}", "{v}"),')
+        else:
+            print(f'Pair("{k}", {v}),')
+
+
 def main():
-    scratch()
-    scratch2()
+    # scratch()
+    # scratch2()
+    scratch3()
 
 
 if __name__ == '__main__':

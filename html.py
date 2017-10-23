@@ -1,36 +1,36 @@
+def split_on_upper(s):
+    # print(f'split_on_upper >> In: {s}')
+    if len(s) == 0:
+        return []
+    indices = []
+    for i in range(1, len(s)):
+        if s[i].isupper():
+            indices.append(i)
+    subs = []
+    m = 0
+    for n in indices:
+        subs.append(s[m:n])
+        m = n
+    subs.append(s[m:])
+    # print(f'split_on_upper >> Out: {subs}')
+    return subs
+
+
+def gen_html(map):
+    fmt = []
+    for k, v in map.items():
+        caption = ' '.join([s.title() for s in split_on_upper(k)])
+        fmt.append(f"""<div class="form-group">
+    <label for="{k}">{caption}</label>
+    <input type="{v}" name="{k}">
+</div>""")
+    return fmt
+
+
 def main():
     map = {
-        "subscriberName": "text",
-        "subscriberPassword": "text",
-        "subscriberCode": "text",
-        "appId": "text",
-        "segment": "text",
-        "productDescription": "text",
-        "termType": "text",
-        "escalation": "text",
-        "disability": "text",
-        "gender": "text",
-        "bmi": "text",
-        "dateOfBirth": "text",
-        "smoker": "text",
-        "monthlyIncome": "text",
-        "educationLevel": "text",
-        "inceptionDate": "text",
-        "em": "text",
-        "pm": "text",
-        "lifeDecision": "text",
-        "occDecision": "text",
-        "adwDecision": "text",
-        "commissionSacrifice": "text",
-        "commissionModel": "text",
-        "coverAmount": "text"
     }
-
-    for k, v in map.items():
-        print(f"""<div class="form-group">
-        <label for="{k}">{k}</label>
-        <input type="{v}" name="{k}">
-    </div>""")
+    [print(s) for s in gen_html(map)]
 
 
 if __name__ == '__main__':
