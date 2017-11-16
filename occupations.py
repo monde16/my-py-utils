@@ -5,6 +5,8 @@ csv_occ_mappings = '/home/phoenix/Downloads/resources/web-app/sak/occupation-map
 csv_occ_updated = '/home/phoenix/Downloads/resources/web-app/sak/occupation-mapping2.csv'
 
 
+# /home/phoenix/wrk/brix_generic_broker/src/main/resources/brix_artifacts/1/seeder/OccupationalConditionEntity.xlsx
+
 def get_rows_dict(filename):
     return csv.DictReader(open(filename, 'r'), delimiter=',', quotechar='"')
 
@@ -31,14 +33,16 @@ def dict_reader_to_dict_list(reader, headers):
     return rows
 
 
-def dist_occ(rows):
+def dist_occ(rows, col='Occupation'):
     """
-    :param rows: DictReader. Or a dict of Product, Occupation, Cover
+    Create a dictionary of Occupations.
+    :param col: the column containing the occupation name
+    :param rows: DictReader. Or a dict that contains a column with name coinciding with col parameter
     :return: { Occupation : [ {Product: Cover} ] }. Occupations map, each field has Product:cover mappings
     """
     occupations = {}
     for row in rows:
-        occ = row['Occupation']
+        occ = row[col]
         if occ not in occupations:
             occupations[occ] = []
         occupations[occ].append({'Product': row['Product'], 'Cover': row['Cover']})
@@ -46,6 +50,11 @@ def dist_occ(rows):
 
 
 def constant(values):
+    """
+    Tests that the values in the given list are the same
+    :param values: items to be tested
+    :return: True iff all elements in 'values' are the equivalent. Else returns False.
+    """
     if len(values) == 0:
         return True
     k = values[0]
@@ -53,6 +62,10 @@ def constant(values):
 
 
 def get_inconsistent(fname):
+    """
+    :param fname:
+    :return: number of product columns with inconsistent cover amounts.
+    """
     reader = get_rows_dict(fname)
     occupations = dist_occ(reader)
     inconsistent_occs = []
@@ -63,7 +76,13 @@ def get_inconsistent(fname):
     return inconsistent_occs
 
 
-def get_distinct_occ(fname, col_name):
+def get_distinct_values(fname, col_name):
+    """
+    Get distinct values in the given column
+    :param fname: name of file of csv
+    :param col_name: name of the column to process
+    :return: a list of distinct values in the specified column
+    """
     rows = get_rows_dict(fname)
     s = {row[col_name] for row in rows}
     return [e for e in s]
@@ -101,8 +120,8 @@ def add_occ_max_values():
 
 
 def test_occ_names_similar():
-    mappings = get_distinct_occ(csv_occ_mappings, 'Description')
-    max_covers = get_distinct_occ(csv_occ_max, 'Occupation')
+    mappings = get_distinct_values(csv_occ_mappings, 'Description')
+    max_covers = get_distinct_values(csv_occ_max, 'Occupation')
     return is_subset(max_covers, mappings)
 
 

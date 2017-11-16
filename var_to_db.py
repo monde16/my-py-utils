@@ -1,6 +1,3 @@
-import re
-
-
 def get_up_indices(s):
     i = -1
     ans = []
