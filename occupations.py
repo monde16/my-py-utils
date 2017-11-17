@@ -1,8 +1,9 @@
+#!/usr/bin/python3
 import csv
 
-csv_occ_max = '/home/phoenix/Downloads/resources/pricing/hiv-pricing/sak-173/occupation_cover_table_V2.csv'
-csv_occ_mappings = '/home/phoenix/Downloads/resources/web-app/sak/occupation-mapping.csv'
-csv_occ_updated = '/home/phoenix/Downloads/resources/web-app/sak/occupation-mapping2.csv'
+csv_occ_max = '/home/phoenix/Downloads/resources/pricing/hiv-pricing/sak-316/csv/Occupation Max Cover.csv'
+csv_occ_mappings = '/home/phoenix/Downloads/resources/pricing/hiv-pricing/sak-316/csv/OccupationalConditionEntity.csv'
+csv_occ_updated = '/home/phoenix/Downloads/resources/pricing/hiv-pricing/sak-316/csv/OccupationalConditionEntity_output.csv'
 
 
 # /home/phoenix/wrk/brix_generic_broker/src/main/resources/brix_artifacts/1/seeder/OccupationalConditionEntity.xlsx
@@ -38,14 +39,14 @@ def dist_occ(rows, col='Occupation'):
     Create a dictionary of Occupations.
     :param col: the column containing the occupation name
     :param rows: DictReader. Or a dict that contains a column with name coinciding with col parameter
-    :return: { Occupation : [ {Product: Cover} ] }. Occupations map, each field has Product:cover mappings
+    :return: { Occupation : [ {Product: MaximumCover} ] }. Occupations map, each field has Product:MaximumCover mappings
     """
     occupations = {}
     for row in rows:
         occ = row[col]
         if occ not in occupations:
             occupations[occ] = []
-        occupations[occ].append({'Product': row['Product'], 'Cover': row['Cover']})
+        occupations[occ].append({'Product': row['Product'], 'MaximumCover': row['MaximumCover']})
     return occupations
 
 
@@ -71,7 +72,7 @@ def get_inconsistent(fname):
     inconsistent_occs = []
     for prod_covers in occupations.items():
         (occ, p) = prod_covers
-        if not constant([e['Cover'] for e in p]):
+        if not constant([e['MaximumCover'] for e in p]):
             inconsistent_occs.append(occ)
     return inconsistent_occs
 
@@ -89,18 +90,13 @@ def get_distinct_values(fname, col_name):
 
 
 def is_subset(sub, sup):
-    if len(sub) > len(sup): return False
-    return len([e for e in sub if e not in sup]) == 0
+    return set(sub) <= set(sup)
 
 
 def reduce_omc(dlst_omc):
-    # s = set()
-    # for row in dlst_omc:
-    #     s.add((row['Occupation'], row['Cover']))
-    # return [{'Occupation': t[0], 'Cover': t[1]} for t in s]
     d = dict()
     for row in dlst_omc:
-        d[row['Occupation']] = row['Cover']
+        d[row['Occupation']] = row['MaximumCover']
     return d
 
 
@@ -134,7 +130,7 @@ def test():
     assert test_occ_names_similar()
 
 
-def fun(data, headers):
+def save_csv(data, headers):
     with open(csv_occ_updated, 'w') as f:
         writer = csv.DictWriter(f, fieldnames=headers)
 
@@ -146,7 +142,7 @@ def fun(data, headers):
 def main():
     updated = add_occ_max_values()
     if len(updated) == 1: return
-    fun(updated, updated[0].keys())
+    save_csv(updated, updated[0].keys())
 
 
 if __name__ == '__main__':
