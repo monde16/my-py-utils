@@ -2,22 +2,35 @@
 import csv
 
 csv_occ_max = '/home/phoenix/Downloads/resources/pricing/hiv-pricing/sak-316/csv/Occupation Max Cover.csv'
-csv_occ_mappings = '/home/phoenix/Downloads/resources/pricing/hiv-pricing/sak-316/csv/OccupationalConditionEntity.csv'
+csv_occ_entities = '/home/phoenix/Downloads/resources/pricing/hiv-pricing/sak-316/csv/OccupationalConditionEntity.csv'
 csv_occ_updated = '/home/phoenix/Downloads/resources/pricing/hiv-pricing/sak-316/csv/OccupationalConditionEntity_output.csv'
-
-
 # /home/phoenix/wrk/brix_generic_broker/src/main/resources/brix_artifacts/1/seeder/OccupationalConditionEntity.xlsx
 
+
 def get_rows_dict(filename):
+    """
+    :param filename: The csv filename
+    :return: a list of dictionaries. Each dict contains a mapping of a column to that row's corresponding
+    value in the column.
+    """
     return csv.DictReader(open(filename, 'r'), delimiter=',', quotechar='"')
 
 
 def get_rows_list(filename):
+    """
+    :param filename: The csv filename
+    :return: a list of lists. Each contained list represents row values.
+    """
     return csv.reader(open(filename, 'r'), delimiter=',', quotechar='"')
 
 
-def get_header_names(fname):
-    with open(fname) as f:
+def get_header_names(filename):
+    """
+    Returns the 1st row values. We assume that these cells contain the header.
+    :param filename: The filename
+    :return: a list containing the header names
+    """
+    with open(filename) as f:
         reader = csv.reader(f)
         cols = next(reader)
     return cols
@@ -62,12 +75,12 @@ def constant(values):
     return len([x for x in values if x != k]) == 0
 
 
-def get_inconsistent(fname):
+def get_inconsistent(filename):
     """
-    :param fname:
-    :return: number of product columns with inconsistent cover amounts.
+    :param filename:
+    :return: number of product columns with varying cover amounts (for different products).
     """
-    reader = get_rows_dict(fname)
+    reader = get_rows_dict(filename)
     occupations = dist_occ(reader)
     inconsistent_occs = []
     for prod_covers in occupations.items():
@@ -77,48 +90,53 @@ def get_inconsistent(fname):
     return inconsistent_occs
 
 
-def get_distinct_values(fname, col_name):
+def get_distinct_values(filename, col_name):
     """
     Get distinct values in the given column
-    :param fname: name of file of csv
+    :param filename: name of file of csv
     :param col_name: name of the column to process
     :return: a list of distinct values in the specified column
     """
-    rows = get_rows_dict(fname)
+    rows = get_rows_dict(filename)
     s = {row[col_name] for row in rows}
     return [e for e in s]
 
 
-def is_subset(sub, sup):
-    return set(sub) <= set(sup)
-
-
-def reduce_omc(dlst_omc):
+def reduce_omc(rows_omc):
+    """
+    Ignores all other columns, thus returning rows with only {Occupation: MaxCover}
+    :param rows_omc: the list of the max cover updates
+    :return: a list of occ,max_cover mappings
+    """
     d = dict()
-    for row in dlst_omc:
+    for row in rows_omc:
         d[row['Occupation']] = row['MaximumCover']
     return d
 
 
-def append_max_covers(dlst_omc, dlst_mappings):
-    omc = reduce_omc(dlst_omc)
-    for row in dlst_mappings:
+def append_max_covers(rows_omc, rows_entities):
+    omc = reduce_omc(rows_omc)
+    for row in rows_entities:
         occ = row['Description']
         if occ in omc:
             row['Occupation Maximum Cover'] = omc[occ]
-    return dlst_mappings
+    return rows_entities
 
 
 def add_occ_max_values():
-    mappings = dict_reader_to_dict_list(get_rows_dict(csv_occ_mappings), get_header_names(csv_occ_mappings))
-    max_covers = dict_reader_to_dict_list(get_rows_dict(csv_occ_max), get_header_names(csv_occ_max))
-    return append_max_covers(max_covers, mappings)
+    entities = dict_reader_to_dict_list(get_rows_dict(csv_occ_entities), get_header_names(csv_occ_entities))  # From the project file
+    max_covers = dict_reader_to_dict_list(get_rows_dict(csv_occ_max), get_header_names(csv_occ_max))  # Contains updates to max cover amounts
+    return append_max_covers(max_covers, entities)
 
 
 def test_occ_names_similar():
-    mappings = get_distinct_values(csv_occ_mappings, 'Description')
+    """
+    Tests that the updates aren't adding any new Occupations. This also helps check for misspellings.
+    :return: True iff the updates contain occupations that are already in the entities file.
+    """
+    entities = get_distinct_values(csv_occ_entities, 'Description')
     max_covers = get_distinct_values(csv_occ_max, 'Occupation')
-    return is_subset(max_covers, mappings)
+    return set(max_covers) <= set(entities)
 
 
 def test_occ_covers_constant():
@@ -141,7 +159,8 @@ def save_csv(data, headers):
 
 def main():
     updated = add_occ_max_values()
-    if len(updated) == 1: return
+    if len(updated) == 1:
+        return
     save_csv(updated, updated[0].keys())
 
 
