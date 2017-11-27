@@ -29,6 +29,8 @@ def gen_html(map):
 
 def main():
     map = {
+        'diabetesType': 'radio',
+        'name': 'text'
     }
     [print(s) for s in gen_html(map)]
 

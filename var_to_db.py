@@ -16,7 +16,7 @@ def unpretty(s):
 
 def extract_kt_var(expr):
     var_name = expr.split(':')[0].replace('val ', '').replace('var ', '')
-    db_name = unpretty(var_name)
+    return unpretty(var_name)
 
 
 def f(lines):

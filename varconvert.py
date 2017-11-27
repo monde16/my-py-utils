@@ -59,26 +59,10 @@ def kt2pg(lines):
 
 def fmt_vars():
     lines = '''
-alcoholDrinksPerWeek: Integer
-bpConstantDosage: Boolean
-bpHigh: Boolean
-bpStable: Boolean
-cholConstantDosage: Boolean
-cholHigh: Boolean
-cholHigh: Boolean
-cholStable: Boolean
-dateOfDiagnosis: Date
-diabetesType: String
-frankProteinuria: Boolean
-hba1c: BigDecimal
-insulin: boolean
-levelOfControl: String
-microAlbuminuria: Boolean
-neuropathy: Boolean
-quoteDate: Date
-smokerCigarettesPerDay: Integer
-    '''
-    fmt = kt2pg([s.strip() for s in lines.split('\n')])
+val premium: BigDecimal
+val coverAmount: BigDecimal
+'''
+    fmt = kt2pg([s.strip() for s in lines.replace(',', '\n').split('\n')])
     [print(s) for s in fmt if len(s) > 0]
 
 

@@ -1,8 +1,5 @@
 import re
-
-
-def find_args(line):
-    return re.findall(r'(?<=[(,\s])([\w_][\w_.\d]*|[\w_][\w_.\d]*\(\))(?=[,)])', line)
+from utils import get_func, get_params
 
 
 def cat_args(args):
@@ -14,22 +11,6 @@ def cat_args(args):
         fmt += f'{p}: "+{p}+"'
         count += 1
     return fmt
-
-
-def fmt_func(s):
-    """
-    Returns the method string from s
-    :param s: the input string
-    :return: the name of a method (if it exists)
-    """
-    prefix = re.match(r'.+=\s*', s)
-    if prefix:
-        s = s.replace(prefix.group(), '')
-    match = re.match(r'^\s*[\w_]([\w\d_.]?[\w\d_])*\s*(?=\()', s)
-    if match:
-        return match.group()
-    else:
-        return ''
 
 
 def pretty(s, initial_big=False):
@@ -64,9 +45,9 @@ def dbg_line(line):
     else:
         return None
 
-    func = fmt_func(expr)
+    func = get_func(expr)
 
-    fmt = cat_args(find_args(line))
+    fmt = cat_args(get_params(line))
     # method = 'log.info'
     method = 'System.out.println'
     if len(func) > 0:
