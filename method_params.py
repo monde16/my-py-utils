@@ -10,14 +10,7 @@ def enforce_non_null(s):
 def msg(tokens):
     method = tokens['method']
     params = tokens['params']
-    if len(params) == 0 or len(method) == 0:
-        return ''
-    s = f'if ('
-    s += ' || '.join([ f'{p} == null' for p in params])
-    s += ') { '
-    s += f'''throw new ServiceRuntimeException("Error in {method}: Null value in {{{', '.join([ f'{p} = "+{p}+"' for p in params ])}}}");'''
-    s += ' }'
-    return s
+    return f'''System.out.println("[DEBUG] {method}({', '.join([ f'{p} = "+{p}+"' for p in params ])})");'''
 
 
 def main():
